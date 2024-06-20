@@ -108,7 +108,7 @@ func (r *VolumeGroupReplicationReconciler) Reconcile(ctx context.Context, req ct
 
 	// Get VolumeGroupReplicationClass
 	volGrouReplClass, err := r.getVolumeGroupReplicationClass(log, types.NamespacedName{
-		Name:      v.instance.Spec.VolumeGroupReplicationClass,
+		Name:      v.instance.Spec.VolumeGroupReplicationClassName,
 		Namespace: req.Namespace,
 	})
 	if err != nil {
@@ -262,7 +262,7 @@ func (r *VolumeGroupReplicationReconciler) listPVCs(
 	instance *volGroupRep.VolumeGroupReplication,
 	logger logr.Logger,
 ) (*corev1.PersistentVolumeClaimList, error) {
-	pvcLabelSelector := instance.Spec.Selector
+	pvcLabelSelector := instance.Spec.Source.Selector
 
 	pvcSelector, err := metav1.LabelSelectorAsSelector(pvcLabelSelector)
 	if err != nil {
@@ -566,7 +566,7 @@ func (v *VGRInstance) updateVGRLastGroupSyncTime() {
 		}
 	}
 
-	v.instance.Status.LastGroupSyncTime = leastLastSyncTime
+	v.instance.Status.LastSyncTime = leastLastSyncTime
 }
 
 func (v *VGRInstance) updateVGRLastGroupSyncDuration() {
@@ -588,7 +588,7 @@ func (v *VGRInstance) updateVGRLastGroupSyncDuration() {
 		}
 	}
 
-	v.instance.Status.LastGroupSyncDuration = maxLastSyncDuration
+	v.instance.Status.LastSyncDuration = maxLastSyncDuration
 }
 
 func (v *VGRInstance) updateVGRLastGroupSyncBytes() {
@@ -609,7 +609,7 @@ func (v *VGRInstance) updateVGRLastGroupSyncBytes() {
 		}
 	}
 
-	v.instance.Status.LastGroupSyncBytes = totalLastSyncBytes
+	v.instance.Status.LastSyncBytes = totalLastSyncBytes
 }
 
 func setFailureCondition(instance *volGroupRep.VolumeGroupReplication) {
